@@ -34,6 +34,13 @@ if __name__ == '__main__':
             inputDataProcessed.append(vector)
         print("Data loaded. {} data vectors loaded.\n".format(len(inputDataProcessed)))
     else:
-        
-        
+        for line in inputDataRaw:
+            splitLine = line.split()
+            vector = []
+            for item in splitLine:
+                vector.append(float(item))
+            inputDataProcessed.append(vector)
+        print("Data loaded. {} data vectors loaded.\n".format(len(inputDataProcessed)))
+    
+    print("Data:\n {}".format(inputDataProcessed))
     
