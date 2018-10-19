@@ -1,12 +1,46 @@
 import numpy as np
 import sys
+import random
 
 # start Main------------------------------------------------------------
 if __name__ == '__main__':
     vectors = processData()
     assignments = cluster(vectors)
     
-def cluster(vectors):
+def cluster(vectors, k):
+    clusterLabels = []
+    centroids = initCentroids(vecotrs,k)
+    for x in vectors:
+        dists = []
+        for c in centroids:
+            dists.append(1 - (np.dot(x,c) / (np.linalg.norm(x) * np.linalg.norm(c))))
+        min = 0
+        for i in range(k):
+            if dists[i] < dists[min]:
+                min = i
+        clusterLabels.append(min+1) 
+            
+    
+def initCentroids(vectors, k):
+    centroids = []
+    centroids.append(random.sample(vectors,1))
+    for i in range(k):
+        squaredDists = getDistances(vectors, centroids)
+        rand = random.random()
+        cumulativeProbabilities = (squaredDists/squaredDists.sum()).cumsum()
+        centroids.append(vectors[np.where(cumulativeProbabilities >= rand)[0][0]])
+    return centroids
+    
+def getDistances(X,cent):
+    dist = []
+    temp = []
+    for x in X:
+        for c in cent:
+            temp.append(np.linalg.norm(x-c)**2)
+        dist.append(np.array(temp).min())
+        temp = []
+
+    return np.array(dist)
     
 def processData():
     try:
