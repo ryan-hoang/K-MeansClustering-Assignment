@@ -3,9 +3,16 @@ import sys
 
 # start Main------------------------------------------------------------
 if __name__ == '__main__':
+    vectors = processData()
+    assignments = cluster(vectors)
     
-    mode = sys.argv[1]
+def cluster(vectors):
     
+def processData():
+    try:
+        mode = sys.argv[1]
+    except:
+        mode = "iris"
     if mode == "text":
         inputFile = "input.dat"
     else:
@@ -23,7 +30,7 @@ if __name__ == '__main__':
     if mode == "text":
         for line in inputDataRaw:
             splitLine = line.split()
-            iterations = len(splitLine)/2
+            iterations = int(len(splitLine)/2)
             vector = [0] * 126373
             for i in range(iterations):
                 index = int(splitLine[0])
@@ -41,6 +48,4 @@ if __name__ == '__main__':
                 vector.append(float(item))
             inputDataProcessed.append(vector)
         print("Data loaded. {} data vectors loaded.\n".format(len(inputDataProcessed)))
-    
-    print("Data:\n {}".format(inputDataProcessed))
-    
+    return inputDataProcessed
