@@ -4,22 +4,33 @@ import random
 
 # start Main------------------------------------------------------------
 if __name__ == '__main__':
+    k = 3
     vectors = processData()
-    assignments = cluster(vectors)
+    centroids = initCentroids(vectors,k)
     
-def cluster(vectors, k):
-    clusterLabels = []
-    centroids = initCentroids(vecotrs,k)
-    for x in vectors:
+    while True:
+        assignments,newCentroids = cluster(vectors,k,centroids)
+        if(centroids == newCentroids):
+            break;
+        else:
+            centroids = newCentroids
+    
+def cluster(vectors, k,centroids):
+    clusterLabels = [-1]*len(vectors)
+    for count,x in enumerate(vectors):
         dists = []
         for c in centroids:
-            dists.append(1 - (np.dot(x,c) / (np.linalg.norm(x) * np.linalg.norm(c))))
+            dists.append(1 - (np.dot(x,c) / (np.linalg.norm(x) * np.linalg.norm(c)))) # list of distances from x to every centroid (cosine distance)
         min = 0
         for i in range(k):
             if dists[i] < dists[min]:
                 min = i
-        clusterLabels.append(min+1) 
-            
+        clusterLabels[count] = min+1
+    
+    #recalculate clusters now
+    
+    
+    return clusterLabels,centroids
     
 def initCentroids(vectors, k):
     centroids = []
@@ -82,4 +93,4 @@ def processData():
                 vector.append(float(item))
             inputDataProcessed.append(vector)
         print("Data loaded. {} data vectors loaded.\n".format(len(inputDataProcessed)))
-    return inputDataProcessed
+    return np.array(inputDataProcessed)
