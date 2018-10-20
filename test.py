@@ -20,6 +20,19 @@ if __name__ == '__main__':
     vector2 = [3,5,4,7,9,11]
     vector3 = [12,4,66,22,25,10]
     
+    vector1 = np.array(vector1)
+    vector2 = np.array(vector2)
+    vector3 = np.array(vector3)
+    
+    x = []
+    x.append(vector1)
+    x.append(vector2)
+    x.append(vector3)
+    x = np.array(x)
+    
+    print(np.mean(x, axis=0))
+    
+    '''
     c = vector3
     x = []
     x.append(vector1)
@@ -34,5 +47,5 @@ if __name__ == '__main__':
     
     
     getDistances(np.array(x),np.array(c))
-    
+    '''
 

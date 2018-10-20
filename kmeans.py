@@ -2,21 +2,11 @@ import numpy as np
 import sys
 import random
 
-# start Main------------------------------------------------------------
-if __name__ == '__main__':
-    k = 3
-    vectors = processData()
-    centroids = initCentroids(vectors,k)
-    
-    while True:
-        assignments,newCentroids = cluster(vectors,k,centroids)
-        if(centroids == newCentroids):
-            break;
-        else:
-            centroids = newCentroids
-    
+
 def cluster(vectors, k,centroids):
+    vectors = np.array(vectors)
     clusterLabels = [-1]*len(vectors)
+    #print(clusterLabels)
     for count,x in enumerate(vectors):
         dists = []
         for c in centroids:
@@ -29,18 +19,30 @@ def cluster(vectors, k,centroids):
     
     #recalculate clusters now
     
+    listofclusters = []
+    for i in range(0,k):
+        listofclusters.append([])
     
-    return clusterLabels,centroids
+    for i in range(len(vectors)): # populate list of clusters with vectors 
+        listofclusters[clusterLabels[i]-1].append(vectors[i])
+    
+    updatedCentroids = []
+    print(len(listofclusters))
+    for cluster in listofclusters: # calculate mean vector in each cluster set that to the centroid
+        updatedCentroids.append(np.mean(cluster, axis=0))
+    
+    return clusterLabels,np.array(updatedCentroids)
     
 def initCentroids(vectors, k):
     centroids = []
-    centroids.append(random.sample(vectors,1))
-    for i in range(k):
+    centroids.append(np.array(random.sample(vectors,1)[0]))
+    vectors = np.array(vectors)
+    for i in range(1,k):
         squaredDists = getDistances(vectors, centroids)
         rand = random.random()
         cumulativeProbabilities = (squaredDists/squaredDists.sum()).cumsum()
         centroids.append(vectors[np.where(cumulativeProbabilities >= rand)[0][0]])
-    return centroids
+    return np.array(centroids)
     
 def getDistances(X,cent):
     dist = []
@@ -83,7 +85,7 @@ def processData():
                 del splitLine[0]
                 del splitLine[0]
                 vector[index-1] = count
-            inputDataProcessed.append(vector)
+            inputDataProcessed.append(np.array(vector))
         print("Data loaded. {} data vectors loaded.\n".format(len(inputDataProcessed)))
     else:
         for line in inputDataRaw:
@@ -91,6 +93,24 @@ def processData():
             vector = []
             for item in splitLine:
                 vector.append(float(item))
-            inputDataProcessed.append(vector)
+            inputDataProcessed.append(np.array(vector))
         print("Data loaded. {} data vectors loaded.\n".format(len(inputDataProcessed)))
-    return np.array(inputDataProcessed)
+    return inputDataProcessed
+    
+def generateAnswerFile(labels):
+    with open("clusterLabels.data", 'w') as outFile:
+        for item in labels:
+            outFile.write("{}\n".format(item))
+# start Main------------------------------------------------------------
+if __name__ == '__main__':
+    k = 3
+    vectors = processData()
+    centroids = initCentroids(vectors,k)
+    
+    while True:
+        assignments,newCentroids = cluster(vectors,k,centroids)
+        if(np.array_equal(centroids,newCentroids)):
+            generateAnswerFile(assignments)
+            break;
+        else:
+            centroids = newCentroids
