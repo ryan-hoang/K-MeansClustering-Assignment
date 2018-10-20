@@ -1,7 +1,8 @@
 import numpy as np
 import sys
 import random
-
+import pickle
+import scipy.sparse as sc
 
 def cluster(vectors, k,centroids):
     vectors = np.array(vectors)
@@ -45,17 +46,23 @@ def initCentroids(vectors, k):
     return np.array(centroids)
     
 def getDistances(X,cent):
+    vectors = sc.csr_matrix(X,copy = True)
+    cen = sc.csr_matrix(cent,copy=True)
     dist = []
     temp = []
-    for x in X:
-        for c in cent:
-            temp.append(np.linalg.norm(x-c)**2)
+    for indx in range(vectors.get_shape()[0]):
+        x = vectors.getrow(indx).toarray()[0]
+        for indc in range(cen.get_shape()[0]):
+            c = cen.getrow(indc).toarray()[0]
+            temp.append(np.linalg.norm(np.subtract(x,c))**2)
         dist.append(np.array(temp).min())
         temp = []
 
     return np.array(dist)
     
 def processData():
+    CURSOR_UP_ONE = '\x1b[1A'
+    ERASE_LINE = '\x1b[2K'
     try:
         mode = sys.argv[1]
     except:
@@ -75,18 +82,23 @@ def processData():
             inputDataRaw.append(line) # each line of input is one element of inputDataRaw
     
     if mode == "text":
-        for line in inputDataRaw:
+        inputDataProcessed = sc.csr_matrix((8550,126373),dtype=np.int8)
+        for ind,line in enumerate(inputDataRaw):
             splitLine = line.split()
             iterations = int(len(splitLine)/2)
-            vector = [0] * 126373
+            #vector = [0] * 126373
+            print(ind)
+            sys.stdout.write(CURSOR_UP_ONE)
+            sys.stdout.write(ERASE_LINE)
             for i in range(iterations):
                 index = int(splitLine[0])
                 count = int(splitLine[1])
                 del splitLine[0]
                 del splitLine[0]
-                vector[index-1] = count
-            inputDataProcessed.append(np.array(vector))
+                inputDataProcessed[ind,index-1] = count
+            #inputDataProcessed.append(vector)
         print("Data loaded. {} data vectors loaded.\n".format(len(inputDataProcessed)))
+        pickle.dump(inputDataProcessed,open("textCSRSparse.dat",'wb'))
     else:
         for line in inputDataRaw:
             splitLine = line.split()
