@@ -45,9 +45,10 @@ def initCentroids(vectors, k):
     #print("t: ",t.toarray())
     centroids.append(t.toarray()[0].tolist())
     #print("Centroids:", centroids)
+    print("First Centroid Calculated.\n")
 
     for i in range(1,k):
-        #print("Centroids: ",centroids)
+        print("Calculating Initial Centroid {}/{}".format(i,k))
         #print("Centroids:{} Iteration: {}".format(centroids,i))
         squaredDists = getDistances(vectors, centroids)
         rand = random.random()
@@ -67,6 +68,9 @@ def getDistances(X,cent):
     for indx in range(vectors.get_shape()[0]):
         x = vectors.getrow(indx).toarray()[0]
         for indc in range(cen.get_shape()[0]):
+            print("Calculating Distance from x: {} to Centroid: {}".format(indx,indc))
+            sys.stdout.write(CURSOR_UP_ONE)
+            sys.stdout.write(ERASE_LINE)
             c = cen.getrow(indc).toarray()
             #print(x,"c: ",c)
             temp.append(np.linalg.norm(np.subtract(x,c))**2)
@@ -131,12 +135,20 @@ def generateAnswerFile(labels):
             outFile.write("{}\n".format(item))
 # start Main------------------------------------------------------------
 if __name__ == '__main__':
+    CURSOR_UP_ONE = '\x1b[1A'
+    ERASE_LINE = '\x1b[2K'
     k = 7
     vectors = processData()
     centroids = initCentroids(vectors,k)
+    print("Initial Centroids Calculated\n")
 
     while True:
         assignments,newCentroids = cluster(vectors,k,centroids)
+        print("Old Centroids: {}\nNew Centroids: {}".format(centroids,newCentroids))
+        sys.stdout.write(CURSOR_UP_ONE)
+        sys.stdout.write(ERASE_LINE)
+        sys.stdout.write(CURSOR_UP_ONE)
+        sys.stdout.write(ERASE_LINE)
         if(np.array_equal(centroids,newCentroids)):
             generateAnswerFile(assignments)
             break;
