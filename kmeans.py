@@ -41,7 +41,7 @@ def initCentroids(vectors, k):
     centroids = []
     randomnumber = random.randint(0,vectors.get_shape()[0])
     #print(randomnumber)
-    t = vectors[randomnumber]
+    t = vectors[randomnumber,0:]
     #print("t: ",t.toarray())
     centroids.append(t.toarray()[0].tolist())
     #print("Centroids:", centroids)
