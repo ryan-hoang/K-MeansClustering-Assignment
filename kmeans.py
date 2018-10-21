@@ -5,10 +5,11 @@ import pickle
 import scipy.sparse as sc
 
 def cluster(vectors, k,centroids):
-    clusterLabels = [-1]*(vectors.get_shape()[0])
+    clusterLabels = [-1]*(len(vectors))
     #print(clusterLabels)
-    for count in range(vectors.get_shape()[0]):
-        x = vectors[count,0:].toarray()[0]
+    for count in range(len(vectors)):
+        x = vectors[count].toarray()[0]
+        #print(x)
         dists = []
         #print("centroids: {} iteration:{}", centroids, count)
         for c in centroids:
@@ -26,9 +27,9 @@ def cluster(vectors, k,centroids):
     for i in range(0,k):
         listofclusters.append([])
 
-    for i in range(vectors.get_shape()[0]): # populate list of clusters with vectors
+    for i in range(len(vectors)): # populate list of clusters with vectors
         #print(type(vectors.getrow(i).toarray()), vectors.getrow(i).toarray()[0])
-        listofclusters[clusterLabels[i]-1].append(vectors[i,0:].toarray()[0])
+        listofclusters[clusterLabels[i]-1].append(vectors[i].toarray()[0])
 
     updatedCentroids = []
     #print(len(listofclusters))
@@ -39,9 +40,9 @@ def cluster(vectors, k,centroids):
 
 def initCentroids(vectors, k):
     centroids = []
-    randomnumber = random.randint(0,vectors.get_shape()[0])
+    randomnumber = random.randint(0,len(vectors))
     #print(randomnumber)
-    t = vectors[randomnumber,0:]
+    t = vectors[randomnumber]
     #print("t: ",t.toarray())
     centroids.append(t.toarray()[0].tolist())
     #print("Centroids:", centroids)
@@ -53,7 +54,7 @@ def initCentroids(vectors, k):
         squaredDists = getDistances(vectors, centroids)
         rand = random.random()
         cumulativeProbabilities = (squaredDists/squaredDists.sum()).cumsum()
-        blah = vectors[np.where(cumulativeProbabilities >= rand)[0][0],0:].toarray()
+        blah = vectors[np.where(cumulativeProbabilities >= rand)[0][0]].toarray()
         #print(type(blah))
         centroids.append(blah.tolist()[0])
     #print("Centroids returned by initCentroids:", centroids)
@@ -65,8 +66,8 @@ def getDistances(X,cent):
     cen = sc.dok_matrix(cent)
     dist = []
     temp = []
-    for indx in range(vectors.get_shape()[0]):
-        x = vectors[indx,0:].toarray()[0]
+    for indx in range(len(vectors)):
+        x = vectors[indx].toarray()[0]
         for indc in range(cen.get_shape()[0]):
             print("Calculating Distance from x: {} to Centroid: {}".format(indx,indc))
             sys.stdout.write(CURSOR_UP_ONE)
@@ -101,8 +102,9 @@ def processData():
             inputDataRaw.append(line) # each line of input is one element of inputDataRaw
 
     if mode == "text":
-        inputDataProcessed = sc.dok_matrix((8580,126373),dtype=np.int8)
+        inputDataProcessed = []
         for ind,line in enumerate(inputDataRaw):
+            temp = sc.dok_matrix((1,126373),dtype=np.int8)
             splitLine = line.split()
             iterations = int(len(splitLine)/2)
             #vector = [0] * 126373
@@ -114,17 +116,19 @@ def processData():
                 count = int(splitLine[1])
                 del splitLine[0]
                 del splitLine[0]
-                inputDataProcessed[ind,index-1] = count
-            #inputDataProcessed.append(vector)
+                temp[0,index-1] = count
+            inputDataProcessed.append(temp)
         print("Data loaded. {} data vectors loaded.\n".format(len(inputDataRaw)))
         pickle.dump(inputDataProcessed,open("textCSRSparse.dat",'wb'))
     else:
-        inputDataProcessed = sc.dok_matrix((150,4),dtype=np.float64)
+        inputDataProcessed = []
         for row,line in enumerate(inputDataRaw):
+            temp = sc.dok_matrix((1,4),dtype=np.float64)
             splitLine = line.split()
             for col,item in enumerate(splitLine):
                 #print(item,type(float(item)))
-                inputDataProcessed[row, col] = float(item)
+                temp[0,col] = float(item)
+            inputDataProcessed.append(temp)
         print("Data loaded. {} data vectors loaded.\n".format(len(inputDataRaw)))
         #print(inputDataProcessed.toarray())
     return inputDataProcessed
