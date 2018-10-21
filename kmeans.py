@@ -71,7 +71,7 @@ def getDistances(X,cent):
             print("Calculating Distance from x: {} to Centroid: {}".format(indx,indc))
             sys.stdout.write(CURSOR_UP_ONE)
             sys.stdout.write(ERASE_LINE)
-            c = cen[indc].toarray()
+            c = cen[indc,0:].toarray()
             #print(x,"c: ",c)
             temp.append(np.linalg.norm(np.subtract(x,c))**2)
         dist.append(np.array(temp).min())
