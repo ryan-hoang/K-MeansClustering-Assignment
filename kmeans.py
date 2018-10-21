@@ -8,7 +8,7 @@ def cluster(vectors, k,centroids):
     clusterLabels = [-1]*(vectors.get_shape()[0])
     #print(clusterLabels)
     for count in range(vectors.get_shape()[0]):
-        x = vectors.getrow(count).toarray()[0]
+        x = vectors[count].toarray()[0]
         dists = []
         #print("centroids: {} iteration:{}", centroids, count)
         for c in centroids:
@@ -28,7 +28,7 @@ def cluster(vectors, k,centroids):
 
     for i in range(vectors.get_shape()[0]): # populate list of clusters with vectors
         #print(type(vectors.getrow(i).toarray()), vectors.getrow(i).toarray()[0])
-        listofclusters[clusterLabels[i]-1].append(vectors.getrow(i).toarray()[0])
+        listofclusters[clusterLabels[i]-1].append(vectors[i].toarray()[0])
 
     updatedCentroids = []
     #print(len(listofclusters))
@@ -41,7 +41,7 @@ def initCentroids(vectors, k):
     centroids = []
     randomnumber = random.randint(0,vectors.get_shape()[0])
     #print(randomnumber)
-    t = vectors.getrow(randomnumber)
+    t = vectors[randomnumber]
     #print("t: ",t.toarray())
     centroids.append(t.toarray()[0].tolist())
     #print("Centroids:", centroids)
@@ -53,7 +53,7 @@ def initCentroids(vectors, k):
         squaredDists = getDistances(vectors, centroids)
         rand = random.random()
         cumulativeProbabilities = (squaredDists/squaredDists.sum()).cumsum()
-        blah = vectors.getrow(np.where(cumulativeProbabilities >= rand)[0][0]).toarray()
+        blah = vectors[np.where(cumulativeProbabilities >= rand)[0][0]].toarray()
         #print(type(blah))
         centroids.append(blah.tolist()[0])
     #print("Centroids returned by initCentroids:", centroids)
@@ -66,12 +66,12 @@ def getDistances(X,cent):
     dist = []
     temp = []
     for indx in range(vectors.get_shape()[0]):
-        x = vectors.getrow(indx).toarray()[0]
+        x = vectors[indx].toarray()[0]
         for indc in range(cen.get_shape()[0]):
             print("Calculating Distance from x: {} to Centroid: {}".format(indx,indc))
             sys.stdout.write(CURSOR_UP_ONE)
             sys.stdout.write(ERASE_LINE)
-            c = cen.getrow(indc).toarray()
+            c = cen[indc].toarray()
             #print(x,"c: ",c)
             temp.append(np.linalg.norm(np.subtract(x,c))**2)
         dist.append(np.array(temp).min())
