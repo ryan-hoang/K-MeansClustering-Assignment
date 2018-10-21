@@ -13,6 +13,9 @@ def cluster(vectors, k,centroids):
         dists = []
         #print("centroids: {} iteration:{}", centroids, count)
         for c in centroids:
+            print("Assigning cluster for vector {}".format(count))
+            sys.stdout.write(CURSOR_UP_ONE)
+            sys.stdout.write(ERASE_LINE)
             dists.append(1 - (np.dot(x,c) / (np.linalg.norm(x) * np.linalg.norm(c)))) # list of distances from x to every centroid (cosine distance)
         min = 0
         for i in range(k):
@@ -33,9 +36,10 @@ def cluster(vectors, k,centroids):
 
     updatedCentroids = []
     #print(len(listofclusters))
+    print("Updating Centroids")
     for cluster in listofclusters: # calculate mean vector in each cluster set that to the centroid
         updatedCentroids.append(np.mean(cluster, axis=0))
-
+    print("Done Updating Centroids")
     return clusterLabels,np.array(updatedCentroids)
 
 def initCentroids(vectors, k):
@@ -149,10 +153,6 @@ if __name__ == '__main__':
     while True:
         assignments,newCentroids = cluster(vectors,k,centroids)
         print("Old Centroids: {}\nNew Centroids: {}".format(centroids,newCentroids))
-        sys.stdout.write(CURSOR_UP_ONE)
-        sys.stdout.write(ERASE_LINE)
-        sys.stdout.write(CURSOR_UP_ONE)
-        sys.stdout.write(ERASE_LINE)
         if(np.array_equal(centroids,newCentroids)):
             generateAnswerFile(assignments)
             break;
